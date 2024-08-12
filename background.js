@@ -15,8 +15,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.storage.local.set({ termsDetected: true }, () => {
         console.log('Terms detected and stored');
         // Set a badge to alert the user
-        chrome.action.setBadgeText({ text: 'Terms Detected!' });
-        chrome.action.setBadgeBackgroundColor({ color: '#82CAFF' });
+        chrome.action.setBadgeText({ text: '!' });
+        chrome.action.setBadgeBackgroundColor({ color: '#FFD900' });
       });
     } else {
       chrome.storage.local.set({ termsDetected: false }, () => {
