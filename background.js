@@ -35,4 +35,5 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
             files: ['scripts/content.js']
         });
     });
+  console.log("tab switched");
 });
