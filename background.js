@@ -1,5 +1,5 @@
 // background.js
-const terms = ["terms of service", "tos", "privacy policy", "terms and conditions", "user agreements"];
+const terms = ["Terms of Service", "TOS", "Privacy Policy", "Terms and Conditions", "User Agreements", "terms of service", "privacy policy", "terms and conditions", "user agreements"];
 
 // Function to check if any of the terms appear in the text content of the document
 function containsTerms(text, terms) {
