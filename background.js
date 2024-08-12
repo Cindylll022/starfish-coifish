@@ -10,10 +10,10 @@ function containsTerms(text, terms) {
 // Listener for messages from content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.textContent) {
-    const textContent = message.textContent;
+    const text = message.textContent;
     console.log("Message received");
 
-    if (containsTerms(textContent, terms)) {
+    if (containsTerms(text, terms)) {
       chrome.storage.local.set({ termsDetected: true }, () => {
         console.log('Terms detected and stored');
         chrome.action.setBadgeText({ text: '!' });
