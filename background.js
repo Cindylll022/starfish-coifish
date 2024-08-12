@@ -8,14 +8,15 @@ function containsTerms(text, terms) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.textContent) {
     const textContent = message.textContent;
+    console.log("message sent")
     
 
     if (containsTerms(textContent, terms)) {
       chrome.storage.local.set({ termsDetected: true }, () => {
         console.log('Terms detected and stored');
         // Set a badge to alert the user
-        chrome.action.setBadgeText({ text: '!' });
-        chrome.action.setBadgeBackgroundColor({ color: '#FF0000' });
+        chrome.action.setBadgeText({ text: 'Terms Detected!' });
+        chrome.action.setBadgeBackgroundColor({ color: '#82CAFF' });
       });
     } else {
       chrome.storage.local.set({ termsDetected: false }, () => {
