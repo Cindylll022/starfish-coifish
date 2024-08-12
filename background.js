@@ -26,3 +26,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   }
 });
+
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+    chrome.tabs.get(activeInfo.tabId, function(tab) {
+        // Inject your content script into the active tab
+        chrome.scripting.executeScript({
+            target: {tabId: activeInfo.tabId},
+            files: ['scripts/content.js']
+        });
+    });
+});
