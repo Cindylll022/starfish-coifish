@@ -30,12 +30,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Listener for tab activation
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.scripting.executeScript({
-    target: {tabId: activeInfo.tabId},
-    files: ['scripts/content.js']
-  }).then(() => {
-    console.log("Content script injected");
-  }).catch((error) => {
-    console.error("Error injecting content script: ", error);
+  // Fetch the tab details to get the URL and other information
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    if (tab.url && !tab.url.startsWith('chrome://')) {
+      chrome.scripting.executeScript({
+        target: { tabId: activeInfo.tabId },
+        files: ['scripts/content.js']
+      }).then(() => {
+        console.log("Content script injected");
+      }).catch((error) => {
+        console.error("Error injecting content script: ", error);
+      });
+    } else {
+      console.log("Ignored chrome:// URL");
+    }
   });
 });
