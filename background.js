@@ -1,6 +1,6 @@
 const terms = [
   "Terms of Service", "TOS", "Privacy Policy", "Terms and Conditions", 
-  "User Agreements"];
+  "User Agreements", "Terms of Use"];
 
 // Function to check if any of the terms appear in the text content
 function containsTerms(text, terms) {
