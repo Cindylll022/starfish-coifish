@@ -46,3 +46,34 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     }
   });
 });
+
+function callGeminiAPI(textContent) {
+  fetch('https://your-api.vercel.app/api/gemini', {  // Replace with your deployed API URL
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text: textContent, // Full text content to be processed
+      client_id: 'your-client-id',
+      client_secret: 'your-client-secret',
+      redirect_uri: 'your-redirect-uri',
+      code: 'authorization-code'  // Adjust based on your OAuth2 flow
+    }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Summary received:', data);
+    chrome.storage.local.set({ summary: data.summary });
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+// Add a listener to handle the message from content script
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.textContent) {
+    callGeminiAPI(message.textContent);
+  }
+});
