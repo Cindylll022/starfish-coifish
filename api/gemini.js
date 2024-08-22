@@ -1,4 +1,5 @@
 const { google } = require('googleapis');
+const axios = require('axios');
 const genai = require('google-generative-ai'); // Ensure this package is installed
 
 export default async function handler(req, res) {
@@ -25,12 +26,15 @@ export default async function handler(req, res) {
       `;
 
       // Make a request to the Gemini API
-      const response = await model.generate_content(prompt, {
-        candidate_count: 1,
-        stop_sequences: ["\n"], // End the summary generation at a new line
-        max_output_tokens: 500, // Adjust based on expected summary length
-        temperature: 0.7 // Adjust creativity level
-      });
+      const response = await model.generate_content(
+        prompt, // Pass the prompt to the Gemini model
+        {
+          candidate_count: 1,
+          stop_sequences: ["\n"], // End the summary generation at a new line
+          max_output_tokens: 500, // Adjust based on expected summary length
+          temperature: 0.7 // Adjust creativity level
+        }
+      );
 
       // Send the summarized text back to the client
       res.status(200).json({ summary: response.text });
