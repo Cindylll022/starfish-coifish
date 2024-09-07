@@ -10,7 +10,7 @@
     "128": "images/icon-128.png"
   },
   "permissions": [
-    "storage", "activeTab", "scripting", "tabs", "webRequest", "webRequestBlocking"
+    "storage", "activeTab", "scripting", "tabs",  "declarativeNetRequest"
   ],
   "action": {
     "default_popup": "popup.html", 
