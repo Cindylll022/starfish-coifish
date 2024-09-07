@@ -48,11 +48,12 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 });
 
 function callGeminiAPI(textContent) {
+  const apiKey = '"AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI"'
   fetch('https://your-api.vercel.app/api/gemini', {  // Replace with your deployed API URL
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-     'Authorization': `Bearer ${AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI}`
+     'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
       text: textContent, // Full text content to be processed
