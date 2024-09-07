@@ -42,7 +42,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log('Terms detected and stored');
         chrome.action.setBadgeText({ text: '!' });
         chrome.action.setBadgeBackgroundColor({ color: '#FFD900' });
-        callGeminiAPI(message.textContent);
+        callGeminiAPI(text);
       });
     } else {
       chrome.storage.local.set({ termsDetected: false }, () => {
