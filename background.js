@@ -48,28 +48,25 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 });
 
 function callGeminiAPI(textContent) {
-  const apiKey = '"AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI"'
-  fetch('https://api.gemini-ai.com/v1/simplify', {  // Replace with your deployed API URL
+  fetch('http://localhost:3000/simplify', {  // Your backend server URL
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-     'Authorization': `Bearer ${apiKey}`
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      text: textContent, // Full text content to be processed
-      client_id: 'your-client-id',
-      client_secret: 'your-client-secret',
-      redirect_uri: 'your-redirect-uri',
-      code: 'authorization-code'  // Adjust based on your OAuth2 flow
-    }),
+    body: JSON.stringify({ text: textContent })
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok: ' + response.statusText);
+    }
+    return response.json();
+  })
   .then(data => {
-    console.log('Summary received:', data.simplified_text);
+    console.log('Simplified Text received:', data.simplified_text);
     chrome.storage.local.set({ summary: data.simplified_text });
   })
   .catch(error => {
-    console.error('Error:', error);
+    console.error('Error during API call:', error);
   });
 }
 
