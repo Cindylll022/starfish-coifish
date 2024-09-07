@@ -1,4 +1,5 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { GoogleGenerativeAI } from 'https://cdn.jsdelivr.net/npm/@google/generative-ai@latest/dist/index.mjs';
+
 const fetch = require('node-fetch');  // Add this if not already included
 
 // Initialize Google Generative AI client
