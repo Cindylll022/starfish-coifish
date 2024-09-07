@@ -18,6 +18,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log('Terms detected and stored');
         chrome.action.setBadgeText({ text: '!' });
         chrome.action.setBadgeBackgroundColor({ color: '#FFD900' });
+        callGeminiAPI(message.textContent);
       });
     } else {
       chrome.storage.local.set({ termsDetected: false }, () => {
@@ -52,6 +53,7 @@ function callGeminiAPI(textContent) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+     'Authorization': `Bearer ${process.env.GEMINI_API_KEY}`
     },
     body: JSON.stringify({
       text: textContent, // Full text content to be processed
@@ -71,9 +73,3 @@ function callGeminiAPI(textContent) {
   });
 }
 
-// Add a listener to handle the message from content script
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.textContent) {
-    callGeminiAPI(message.textContent);
-  }
-});
