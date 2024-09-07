@@ -52,7 +52,7 @@ function callGeminiAPI(textContent) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-     'Authorization': `Bearer ${process.env.GEMINI_API_KEY}`
+     'Authorization': `Bearer ${AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI}`
     },
     body: JSON.stringify({
       text: textContent, // Full text content to be processed
@@ -64,7 +64,7 @@ function callGeminiAPI(textContent) {
   })
   .then(response => response.json())
   .then(data => {
-    console.log('Summary received:', data);
+    console.log('Summary received:', data.summary);
     chrome.storage.local.set({ summary: data.summary });
   })
   .catch(error => {
