@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const app = express();
 const port = 3000;
@@ -7,7 +8,8 @@ const port = 3000;
 const client = new GoogleGenerativeAI({ apiKey: 'AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI'});
 
 // Middleware to parse JSON bodies
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));  // Adjust the limit as needed
+app.use(cors());
 
 // Endpoint to handle text simplification
 app.post('/simplify', async (req, res) => {
