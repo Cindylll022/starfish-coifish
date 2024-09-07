@@ -49,7 +49,7 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 
 function callGeminiAPI(textContent) {
   const apiKey = '"AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI"'
-  fetch('https://your-api.vercel.app/api/gemini', {  // Replace with your deployed API URL
+  fetch('https://api.gemini-ai.com/v1/simplify', {  // Replace with your deployed API URL
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -65,8 +65,8 @@ function callGeminiAPI(textContent) {
   })
   .then(response => response.json())
   .then(data => {
-    console.log('Summary received:', data.summary);
-    chrome.storage.local.set({ summary: data.summary });
+    console.log('Summary received:', data.simplified_text);
+    chrome.storage.local.set({ summary: data.simplified_text });
   })
   .catch(error => {
     console.error('Error:', error);
