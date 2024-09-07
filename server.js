@@ -4,20 +4,31 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const app = express();
 const port = 3000;
 
-// Initialize Google Generative AI client
-const client = new GoogleGenerativeAI({ apiKey: 'AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI'});
+const apiKey = 'YOUR_API_KEY';  // Replace with your actual API key
+const genAI = new GoogleGenerativeAI(apiKey);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-// Middleware to parse JSON bodies
-app.use(express.json({ limit: '10mb' }));  // Adjust the limit as needed
+app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 
-// Endpoint to handle text simplification
 app.post('/simplify', async (req, res) => {
   const textContent = req.body.text;
 
   try {
-    const response = await client.simplifyText(textContent);
-    res.json(response);
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: textContent }],
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 200,  // Adjust as needed
+        temperature: 0.5,     // Adjust as needed
+        stopSequences: ['\n'],  // Define stop sequences if needed
+      },
+    });
+    res.json({ summary: result.response.text() });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

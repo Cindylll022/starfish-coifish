@@ -1,3 +1,11 @@
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fetch = require('node-fetch');  // Add this if not already included
+
+// Initialize Google Generative AI client
+const apiKey = 'AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI';  // Make sure to replace with your actual API key
+const genAI = new GoogleGenerativeAI(apiKey);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
 const terms = [
   "Terms of Service", "TOS", "Privacy Policy", "Terms and Conditions", 
   "User Agreements", "Terms of Use"];
@@ -48,38 +56,32 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 });
 
 function callGeminiAPI(textContent) {
-  const CHUNK_SIZE = 1000;  // Adjust chunk size as needed
-  const chunks = textContent.match(new RegExp(`.{1,${CHUNK_SIZE}}`, 'g'));
-
-  chunks.forEach(chunk => {
-    fetch('http://localhost:3000/simplify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text: chunk })
-    })
-    .then(response => {
-      if (!response.ok) {
-        return response.text().then(text => {
-          throw new Error(`Network response was not ok: ${response.statusText}. Response body: ${text}`);
-        });
+  return model.generateContent({
+    contents: [
+      {
+        role: 'user',
+        parts: [{ text: textContent }],
       }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Simplified Text received:', data.simplified_text);
-      chrome.storage.local.set({ summary: data.simplified_text });
-    })
-    .catch(error => {
-      console.error('Error during API call:', error);
-    });
+    ],
+    generationConfig: {
+      maxOutputTokens: 200,  // Adjust as needed
+      temperature: 0.5,     // Adjust as needed for more or less creativity
+      stopSequences: ['\n'],  // Define stop sequences if needed
+    },
   });
 }
 
 // Add a listener to handle the message from content script
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.textContent) {
-    callGeminiAPI(message.textContent);
+    callGeminiAPI(message.textContent)
+      .then(result => {
+        console.log('Summary received:', result.response.text());
+        chrome.storage.local.set({ summary: result.response.text() });
+      })
+      .catch(error => {
+        console.error('Error during API call:', error);
+      });
   }
 });
+
