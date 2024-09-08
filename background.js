@@ -1,14 +1,13 @@
-// Use import statement correctly in an ES module context
-import { GoogleGenerativeAI } from 'https://cdn.jsdelivr.net/npm/@google/generative-ai@latest/dist/index.mjs';
-
-// Initialize Google Generative AI client
-const apiKey = 'YOUR_API_KEY';  // Replace with your actual API key
-const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-// Function to call the Gemini API
-async function callGeminiAPI(textContent) {
+async function initializeAndCallAPI(textContent) {
   try {
+    const module = await import('https://cdn.jsdelivr.net/npm/@google/generative-ai@latest/dist/index.mjs');
+    const { GoogleGenerativeAI } = module;
+
+    // Initialize Google Generative AI client
+    const apiKey = 'YOUR_API_KEY';  // Replace with your actual API key
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
     const result = await model.generateContent({
       contents: [
         {
@@ -22,11 +21,21 @@ async function callGeminiAPI(textContent) {
         stopSequences: ['\n'],  // Define stop sequences if needed
       },
     });
+
     console.log('Summary received:', result.response.text());
     chrome.storage.local.set({ summary: result.response.text() });
   } catch (error) {
     console.error('Error during API call:', error);
   }
+}
+const terms = [
+  "Terms of Service", "TOS", "Privacy Policy", "Terms and Conditions", 
+  "User Agreements", "Terms of Use"
+];
+
+// Function to check if any of the terms appear in the text content
+function containsTerms(text, terms) {
+  return terms.some(term => text.toLowerCase().includes(term.toLowerCase()));
 }
 
 // Listener for messages from content scripts
@@ -35,7 +44,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const text = message.textContent;
     console.log("Message received");
 
-    // Process the text content
     if (containsTerms(text, terms)) {
       chrome.storage.local.set({ termsDetected: true }, () => {
         console.log('Terms detected and stored');
@@ -50,9 +58,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     // Call the Gemini API with the text content
-    callGeminiAPI(text);
+    initializeAndCallAPI(text);
   }
 });
+
 // Listener for tab activation
 chrome.tabs.onActivated.addListener((activeInfo) => {
   // Fetch the tab details to get the URL and other information
@@ -71,4 +80,3 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     }
   });
 });
-
