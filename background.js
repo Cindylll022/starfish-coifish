@@ -70,21 +70,17 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
   });
 });
 
-function splitText(text, maxLength) {
-  let chunks = [];
-  for (let i = 0; i < text.length; i += maxLength) {
-    chunks.push(text.substring(i, i + maxLength));
-  }
-  return chunks;
-}
+const promptTemplate = "The following text seperated by the escape character new line is content scraped from a webpage which includes Terms and Conditions, Privacy Policy, and similar legal documents. Summarize the legal document and do not include any of the content from this prompt or any other content from the web scraped content apart from the legal document.";
+const finalPrompt = `${promptTemplate}\n${textContent}`;
 
 function callServer(textContent) {
+  const finalPrompt = `${promptTemplate} ${textContent}`;  // Combine the template with text
   fetch('http://localhost:3000/simplify', {  // Your backend server URL
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ text: textContent })
+    body: JSON.stringify({ text: finalPrompt })
   })
   .then(response => {
     if (!response.ok) {
