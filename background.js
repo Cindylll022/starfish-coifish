@@ -9,11 +9,20 @@ function cleanText(text) {
   // Remove window-level assignments like "window.pageType = 'article';"
   text = text.replace(/window\.[a-zA-Z]+\s*=\s*["'a-zA-Z0-9\s-]+;/g, ''); // Removes "window.pageType = 'article';"
 
-  // Remove try/catch blocks or other specific inline JavaScript code
+  // Remove self-invoking functions or try-catch blocks
   text = text.replace(/\(function\s*\(\)\s*{[^}]*}\)\(\);?/g, ''); // Removes self-invoking functions
 
-  // Optionally remove any other unwanted patterns
-  text = text.trim(); // Trim leading and trailing whitespace
+  // Remove document or other JS functions like "document.cookie.includes(...)"
+  text = text.replace(/document\.[a-zA-Z]+\([^)]*\)[^;]*;/g, ''); // Removes "document.cookie.includes(...);"
+
+  // Remove any content following "Accessibility statement" and similar footer information
+  text = text.replace(/Accessibility statement[\s\S]*/i, ''); // Cuts off everything after "Accessibility statement"
+
+  // Optionally remove other unwanted patterns (like dates or site-specific info)
+  text = text.replace(/\b(Updated|Published):?\s+[A-Za-z]+\s+\d{1,2},\s+\d{4}/g, ''); // Removes date patterns
+
+  // Trim leading and trailing whitespace
+  text = text.trim(); 
 
   return text;
 }
