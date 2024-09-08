@@ -29,6 +29,7 @@ app.post('/simplify', async (req, res) => {
       },
     });
     res.json({ summary: result.response.text() });
+    console.log(result.response.text())
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
