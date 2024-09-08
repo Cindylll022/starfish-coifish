@@ -71,7 +71,6 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 });
 
 const promptTemplate = "The following text seperated by the escape character new line is content scraped from a webpage which includes Terms and Conditions, Privacy Policy, and similar legal documents. Summarize the legal document and do not include any of the content from this prompt or any other content from the web scraped content apart from the legal document.";
-const finalPrompt = `${promptTemplate}\n${textContent}`;
 
 function callServer(textContent) {
   const finalPrompt = `${promptTemplate} ${textContent}`;  // Combine the template with text
