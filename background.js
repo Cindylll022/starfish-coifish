@@ -66,7 +66,7 @@ function callServer(textContent) {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Simplified Text received:', data.simplified_text);
+      console.log('Simplified Text received:', data.summary);
       // Handle combined results if needed
     })
     .catch(error => {
