@@ -11,13 +11,6 @@ function extractPrivacyPolicy(text) {
   cleanedText = cleanedText.replace(/(\{.*?\})/gs, '');              // Remove object-like patterns
   cleanedText = cleanedText.replace(/(var|const|let)\s.*?;/g, '');   // Remove variable declarations
   
-  // Now, focus on keeping the privacy policy content only
-  const policyStart = cleanedText.search(/Privacy Policy/i); // Locate the start of the privacy policy
-  const policyEnd = cleanedText.search(/Changes to Our Privacy Policy/i); // Locate the end
-
-  if (policyStart !== -1 && policyEnd !== -1) {
-    cleanedText = cleanedText.substring(policyStart, policyEnd + "Changes to Our Privacy Policy".length);
-  }
 
   // Clean up extra line breaks or whitespace
   cleanedText = cleanedText.replace(/\n\s*\n/g, '\n\n').trim();
