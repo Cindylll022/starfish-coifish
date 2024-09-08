@@ -48,28 +48,30 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
   });
 });
 
+function splitText(text, maxLength) {
+  let chunks = [];
+  for (let i = 0; i < text.length; i += maxLength) {
+    chunks.push(text.substring(i, i + maxLength));
+  }
+  return chunks;
+}
+
 function callServer(textContent) {
-  fetch('http://localhost:3000/simplify', {  // Your backend server URL
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ text: textContent })
-  })
-  .then(response => {
-    if (!response.ok) {
-      return response.text().then(text => {
-        throw new Error(`Network response was not ok: ${response.statusText}. Response body: ${text}`);
-      });
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Simplified Text received:', data.simplified_text);
-    chrome.storage.local.set({ summary: data.simplified_text });
-  })
-  .catch(error => {
-    console.error('Error during API call:', error);
+  const chunks = splitText(textContent, 10000);  // Split into 10,000 character chunks
+  chunks.forEach((chunk) => {
+    fetch('http://localhost:3000/simplify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: chunk })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Simplified Text received:', data.simplified_text);
+      // Handle combined results if needed
+    })
+    .catch(error => {
+      console.error('Error during API call:', error);
+    });
   });
 }
 
