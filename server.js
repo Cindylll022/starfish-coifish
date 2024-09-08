@@ -33,7 +33,7 @@ app.post('/simplify', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-console.log(result.response.text())
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
