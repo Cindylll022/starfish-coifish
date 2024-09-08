@@ -8,7 +8,7 @@ const apiKey = 'AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI';  // Replace with your 
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(cors());
 
 app.post('/simplify', async (req, res) => {
