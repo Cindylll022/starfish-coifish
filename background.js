@@ -1,24 +1,28 @@
-function cleanText(text) {
-  // Remove <script> and <style> tags and their content
-  text = text.replace(/<script[^>]*>([\S\s]*?)<\/script>/gi, '');
-  text = text.replace(/<style[^>]*>([\S\s]*?)<\/style>/gi, '');
+function extractPrivacyPolicy(text) {
+  // Remove JavaScript code by detecting common patterns
+  // This regex will remove anything between <script>...</script> tags and functions.
+  let cleanedText = text.replace(/<script.*?>.*?<\/script>/gs, '');  // Remove <script> tags
+  cleanedText = cleanedText.replace(/(function.*?\{.*?\})/gs, '');   // Remove JavaScript function blocks
+  cleanedText = cleanedText.replace(/window\..*;/g, '');              // Remove window object calls
+  cleanedText = cleanedText.replace(/document\..*;/g, '');            // Remove document object calls
+  cleanedText = cleanedText.replace(/try\s?\{.*?\}\s?catch\s?\(.*?\)\s?\{.*?\}/gs, ''); // Remove try-catch blocks
 
-  // Remove inline JavaScript or object definitions like "window.Fusion = {...};"
-  text = text.replace(/window\.[a-zA-Z]+\s*=\s*{[^}]*};?/g, ''); // Removes blocks like "window.Fusion = {...};"
+  // Removing any remaining JS blocks or other code-like patterns
+  cleanedText = cleanedText.replace(/(\{.*?\})/gs, '');              // Remove object-like patterns
+  cleanedText = cleanedText.replace(/(var|const|let)\s.*?;/g, '');   // Remove variable declarations
+  
+  // Now, focus on keeping the privacy policy content only
+  const policyStart = cleanedText.search(/Privacy Policy/i); // Locate the start of the privacy policy
+  const policyEnd = cleanedText.search(/Changes to Our Privacy Policy/i); // Locate the end
 
-  // Remove window-level assignments like "window.pageType = 'article';"
-  text = text.replace(/window\.[a-zA-Z]+\s*=\s*["'a-zA-Z0-9\s-]+;/g, ''); // Removes "window.pageType = 'article';"
+  if (policyStart !== -1 && policyEnd !== -1) {
+    cleanedText = cleanedText.substring(policyStart, policyEnd + "Changes to Our Privacy Policy".length);
+  }
 
-  // Remove self-invoking functions or try-catch blocks
-  text = text.replace(/\(function\s*\(\)\s*{[^}]*}\)\(\);?/g, ''); // Removes self-invoking functions
+  // Clean up extra line breaks or whitespace
+  cleanedText = cleanedText.replace(/\n\s*\n/g, '\n\n').trim();
 
-  // Remove document or other JS functions like "document.cookie.includes(...)"
-  text = text.replace(/document\.[a-zA-Z]+\([^)]*\)[^;]*;/g, ''); // Removes "document.cookie.includes(...);"
-
-  // Trim leading and trailing whitespace
-  text = text.trim(); 
-
-  return text;
+  return cleanedText;
 }
 
 const terms = [
@@ -33,7 +37,7 @@ function containsTerms(text, terms) {
 // Listener for messages from content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.textContent) {
-    const text = cleanText(message.textContent);
+    const text = extractPrivacyPolicy(message.textContent);
     console.log("Cleaned text:", text);
 
     if (containsTerms(text, terms)) {
