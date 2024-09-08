@@ -52,7 +52,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.action.setBadgeText({ text: '' }); // Clear the badge
       });
     }
-    callServer(message.textContent)
+    callServer(text)
   }
 });
 
