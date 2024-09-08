@@ -1,37 +1,6 @@
-async function initializeAndCallAPI(textContent) {
-  try {
-    const module = await import('https://cdn.jsdelivr.net/npm/@google/generative-ai@latest/dist/index.mjs');
-    const { GoogleGenerativeAI } = module;
-
-    // Initialize Google Generative AI client
-    const apiKey = 'YOUR_API_KEY';  // Replace with your actual API key
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-    const result = await model.generateContent({
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: textContent }],
-        }
-      ],
-      generationConfig: {
-        maxOutputTokens: 200,  // Adjust as needed
-        temperature: 0.5,     // Adjust as needed for more or less creativity
-        stopSequences: ['\n'],  // Define stop sequences if needed
-      },
-    });
-
-    console.log('Summary received:', result.response.text());
-    chrome.storage.local.set({ summary: result.response.text() });
-  } catch (error) {
-    console.error('Error during API call:', error);
-  }
-}
 const terms = [
   "Terms of Service", "TOS", "Privacy Policy", "Terms and Conditions", 
-  "User Agreements", "Terms of Use"
-];
+  "User Agreements", "Terms of Use"];
 
 // Function to check if any of the terms appear in the text content
 function containsTerms(text, terms) {
@@ -56,9 +25,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.action.setBadgeText({ text: '' }); // Clear the badge
       });
     }
-
-    // Call the Gemini API with the text content
-    initializeAndCallAPI(text);
+    callServer(message.textContent)
   }
 });
 
@@ -80,3 +47,31 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     }
   });
 });
+
+function callServer(textContent) {
+  fetch('http://localhost:3000/simplify', {  // Your backend server URL
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ text: textContent })
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.text().then(text => {
+        throw new Error(`Network response was not ok: ${response.statusText}. Response body: ${text}`);
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Simplified Text received:', data.simplified_text);
+    chrome.storage.local.set({ summary: data.simplified_text });
+  })
+  .catch(error => {
+    console.error('Error during API call:', error);
+  });
+}
+
+
+
