@@ -15,12 +15,6 @@ function cleanText(text) {
   // Remove document or other JS functions like "document.cookie.includes(...)"
   text = text.replace(/document\.[a-zA-Z]+\([^)]*\)[^;]*;/g, ''); // Removes "document.cookie.includes(...);"
 
-  // Remove any content following "Accessibility statement" and similar footer information
-  text = text.replace(/Accessibility statement[\s\S]*/i, ''); // Cuts off everything after "Accessibility statement"
-
-  // Optionally remove other unwanted patterns (like dates or site-specific info)
-  text = text.replace(/\b(Updated|Published):?\s+[A-Za-z]+\s+\d{1,2},\s+\d{4}/g, ''); // Removes date patterns
-
   // Trim leading and trailing whitespace
   text = text.trim(); 
 
