@@ -1,19 +1,21 @@
 function extractPrivacyPolicy(text) {
-  // Remove JavaScript code by detecting common patterns
-  // This regex will remove anything between <script>...</script> tags and functions.
-  let cleanedText = text.replace(/<script.*?>.*?<\/script>/gs, '');  // Remove <script> tags
-  cleanedText = cleanedText.replace(/(function.*?\{.*?\})/gs, '');   // Remove JavaScript function blocks
-  cleanedText = cleanedText.replace(/window\..*;/g, '');              // Remove window object calls
-  cleanedText = cleanedText.replace(/document\..*;/g, '');            // Remove document object calls
-  cleanedText = cleanedText.replace(/try\s?\{.*?\}\s?catch\s?\(.*?\)\s?\{.*?\}/gs, ''); // Remove try-catch blocks
+  let cleanedText = text.replace(/<script.*?>.*?<\/script>/gs, '');
 
-  // Removing any remaining JS blocks or other code-like patterns
-  cleanedText = cleanedText.replace(/(\{.*?\})/gs, '');              // Remove object-like patterns
-  cleanedText = cleanedText.replace(/(var|const|let)\s.*?;/g, '');   // Remove variable declarations
-  
+  // Remove JavaScript function blocks, window/document variables, and inline scripts
+  cleanedText = cleanedText.replace(/(function.*?\{.*?\})/gs, '');    // Remove function blocks
+  cleanedText = cleanedText.replace(/window\..*?;/g, '');             // Remove window.* expressions
+  cleanedText = cleanedText.replace(/document\..*?;/g, '');           // Remove document.* expressions
+  cleanedText = cleanedText.replace(/try\s*{[^}]*}\s*catch\s*\([^\)]*\)\s*{[^}]*}/gs, ''); // Remove try-catch blocks
+  cleanedText = cleanedText.replace(/var\s+\w+\s*=\s*.*?;/g, '');     // Remove var declarations
+  cleanedText = cleanedText.replace(/const\s+\w+\s*=\s*.*?;/g, '');   // Remove const declarations
+  cleanedText = cleanedText.replace(/let\s+\w+\s*=\s*.*?;/g, '');     // Remove let declarations
 
-  // Clean up extra line breaks or whitespace
-  cleanedText = cleanedText.replace(/\n\s*\n/g, '\n\n').trim();
+  // Remove any incomplete leftover fragments (e.g., `window.Fusion =;`, isolated brackets)
+  cleanedText = cleanedText.replace(/window\.\w+\s*=\s*;?/g, '');     // Remove incomplete window.* expressions
+  cleanedText = cleanedText.replace(/\([^)]*\)\s*;?/g, '');           // Remove isolated function calls like `()`
+
+  // Remove leftover characters like `{}();` or loose parentheses and brackets
+  cleanedText = cleanedText.replace(/[{}();]+/g, '');
 
   return cleanedText;
 }
