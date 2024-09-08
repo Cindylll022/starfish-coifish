@@ -1,20 +1,10 @@
-// Use the correct URL for importing
+// Use import statement correctly in an ES module context
 import { GoogleGenerativeAI } from 'https://cdn.jsdelivr.net/npm/@google/generative-ai@latest/dist/index.mjs';
 
 // Initialize Google Generative AI client
 const apiKey = 'YOUR_API_KEY';  // Replace with your actual API key
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-const terms = [
-  "Terms of Service", "TOS", "Privacy Policy", "Terms and Conditions", 
-  "User Agreements", "Terms of Use"
-];
-
-// Function to check if any of the terms appear in the text content
-function containsTerms(text, terms) {
-  return terms.some(term => text.toLowerCase().includes(term.toLowerCase()));
-}
 
 // Function to call the Gemini API
 async function callGeminiAPI(textContent) {
@@ -45,6 +35,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const text = message.textContent;
     console.log("Message received");
 
+    // Process the text content
     if (containsTerms(text, terms)) {
       chrome.storage.local.set({ termsDetected: true }, () => {
         console.log('Terms detected and stored');
@@ -62,7 +53,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     callGeminiAPI(text);
   }
 });
-
 // Listener for tab activation
 chrome.tabs.onActivated.addListener((activeInfo) => {
   // Fetch the tab details to get the URL and other information
@@ -81,3 +71,4 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     }
   });
 });
+
