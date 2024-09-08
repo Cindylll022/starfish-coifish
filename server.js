@@ -25,7 +25,7 @@ app.post('/simplify', async (req, res) => {
       generationConfig: {
         maxOutputTokens: 10000000000,  // Adjust as needed
         temperature: 0.5,     // Adjust as needed
-        stopSequences: ['\n'],  // Define stop sequences if needed
+        //stopSequences: ['\n'],  // Define stop sequences if needed
       },
     });
     res.json({ summary: result.response.text() });
