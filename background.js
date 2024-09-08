@@ -47,7 +47,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.action.setBadgeText({ text: '' }); // Clear the badge
       });
     }
-    callServer(text)
+    callServer(text);
   }
 });
 
@@ -74,7 +74,7 @@ const promptTemplate = "The following text seperated by the escape character new
 
 function callServer(textContent) {
   const finalPrompt = `${promptTemplate} ${textContent}`;  // Combine the template with text
-  fetch('http://localhost:3000/simplify', {  // Your backend server URL
+  fetch('http://localhost:3000/simplify'), {  // Your backend server URL
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
