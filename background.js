@@ -1,13 +1,21 @@
 function cleanText(text) {
-  // Remove script and style content
+  // Remove <script> and <style> tags and their content
   text = text.replace(/<script[^>]*>([\S\s]*?)<\/script>/gi, '');
   text = text.replace(/<style[^>]*>([\S\s]*?)<\/style>/gi, '');
 
-  // Remove any other unwanted patterns
-  text = text.replace(/<\/?\w+[^>]*>/g, ''); // Remove HTML tags
+  // Remove inline JavaScript or object definitions like "window.Fusion = {...};"
+  text = text.replace(/window\.[a-zA-Z]+\s*=\s*{[^}]*};?/g, ''); // Removes blocks like "window.Fusion = {...};"
 
-  // Optionally, remove other specific patterns or content
-  return text.trim(); // Trim whitespace
+  // Remove window-level assignments like "window.pageType = 'article';"
+  text = text.replace(/window\.[a-zA-Z]+\s*=\s*["'a-zA-Z0-9\s-]+;/g, ''); // Removes "window.pageType = 'article';"
+
+  // Remove try/catch blocks or other specific inline JavaScript code
+  text = text.replace(/\(function\s*\(\)\s*{[^}]*}\)\(\);?/g, ''); // Removes self-invoking functions
+
+  // Optionally remove any other unwanted patterns
+  text = text.trim(); // Trim leading and trailing whitespace
+
+  return text;
 }
 
 const terms = [
