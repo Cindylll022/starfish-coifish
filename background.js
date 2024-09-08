@@ -57,39 +57,28 @@ function splitText(text, maxLength) {
 }
 
 function callServer(textContent) {
-  const chunks = splitText(textContent, 10000);  // Split into 10,000 character chunks
-  let combinedResult = ''; // Initialize an empty string to store combined results
-  
-  // Use a counter to track completed chunks
-  let completedChunks = 0;
-
-  chunks.forEach((chunk, index) => {
-    fetch('http://localhost:3000/simplify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: chunk })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data && data.summary) {
-        combinedResult += data.summary; // Combine results
-        completedChunks++;
-
-        // Store the combined result in local storage once all chunks are processed
-        if (completedChunks === chunks.length) {
-          chrome.storage.local.set({ summary: combinedResult }, () => {
-            console.log('Combined simplified text stored');
-          });
-        }
-      } else {
-        console.error('Invalid response structure:', data);
-      }
-    })
-    .catch(error => {
-      console.error('Error during API call:', error);
-    });
+  fetch('http://localhost:3000/simplify', {  // Your backend server URL
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ text: textContent })
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.text().then(text => {
+        throw new Error(`Network response was not ok: ${response.statusText}. Response body: ${text}`);
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Simplified Text received:', data.summary);
+    chrome.storage.local.set({ summary: data.summary });
+  })
+  .catch(error => {
+    console.error('Error during API call:', error);
   });
 }
-
 
 
