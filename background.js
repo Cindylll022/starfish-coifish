@@ -58,7 +58,12 @@ function splitText(text, maxLength) {
 
 function callServer(textContent) {
   const chunks = splitText(textContent, 10000);  // Split into 10,000 character chunks
-  chunks.forEach((chunk) => {
+  let combinedResult = ''; // Initialize an empty string to store combined results
+  
+  // Use a counter to track completed chunks
+  let completedChunks = 0;
+
+  chunks.forEach((chunk, index) => {
     fetch('http://localhost:3000/simplify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -66,8 +71,19 @@ function callServer(textContent) {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Simplified Text received:', data.summary);
-      // Handle combined results if needed
+      if (data && data.summary) {
+        combinedResult += data.summary; // Combine results
+        completedChunks++;
+
+        // Store the combined result in local storage once all chunks are processed
+        if (completedChunks === chunks.length) {
+          chrome.storage.local.set({ summary: combinedResult }, () => {
+            console.log('Combined simplified text stored');
+          });
+        }
+      } else {
+        console.error('Invalid response structure:', data);
+      }
     })
     .catch(error => {
       console.error('Error during API call:', error);
