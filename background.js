@@ -1,3 +1,15 @@
+function cleanText(text) {
+  // Remove script and style content
+  text = text.replace(/<script[^>]*>([\S\s]*?)<\/script>/gi, '');
+  text = text.replace(/<style[^>]*>([\S\s]*?)<\/style>/gi, '');
+
+  // Remove any other unwanted patterns
+  text = text.replace(/<\/?\w+[^>]*>/g, ''); // Remove HTML tags
+
+  // Optionally, remove other specific patterns or content
+  return text.trim(); // Trim whitespace
+}
+
 const terms = [
   "Terms of Service", "TOS", "Privacy Policy", "Terms and Conditions", 
   "User Agreements", "Terms of Use"];
@@ -10,8 +22,8 @@ function containsTerms(text, terms) {
 // Listener for messages from content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.textContent) {
-    const text = message.textContent;
-    console.log("Message received");
+    const text = cleanText(message.textContent);
+    console.log("Cleaned text:", text);
 
     if (containsTerms(text, terms)) {
       chrome.storage.local.set({ termsDetected: true }, () => {
