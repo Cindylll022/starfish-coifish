@@ -1,19 +1,42 @@
-import { GoogleGenerativeAI } from 'https://cdn.jsdelivr.net/node_modules/@google/generative-ai@latest/dist/index.mjs';
-
-const fetch = require('node-fetch');  // Add this if not already included
+// Use the correct URL for importing
+import { GoogleGenerativeAI } from 'https://cdn.jsdelivr.net/npm/@google/generative-ai@latest/dist/index.mjs';
 
 // Initialize Google Generative AI client
-const apiKey = 'AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI';  // Make sure to replace with your actual API key
+const apiKey = 'YOUR_API_KEY';  // Replace with your actual API key
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 const terms = [
   "Terms of Service", "TOS", "Privacy Policy", "Terms and Conditions", 
-  "User Agreements", "Terms of Use"];
+  "User Agreements", "Terms of Use"
+];
 
 // Function to check if any of the terms appear in the text content
 function containsTerms(text, terms) {
   return terms.some(term => text.toLowerCase().includes(term.toLowerCase()));
+}
+
+// Function to call the Gemini API
+async function callGeminiAPI(textContent) {
+  try {
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: textContent }],
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 200,  // Adjust as needed
+        temperature: 0.5,     // Adjust as needed for more or less creativity
+        stopSequences: ['\n'],  // Define stop sequences if needed
+      },
+    });
+    console.log('Summary received:', result.response.text());
+    chrome.storage.local.set({ summary: result.response.text() });
+  } catch (error) {
+    console.error('Error during API call:', error);
+  }
 }
 
 // Listener for messages from content scripts
@@ -34,6 +57,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.action.setBadgeText({ text: '' }); // Clear the badge
       });
     }
+
+    // Call the Gemini API with the text content
+    callGeminiAPI(text);
   }
 });
 
@@ -55,34 +81,3 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     }
   });
 });
-
-function callGeminiAPI(textContent) {
-  return model.generateContent({
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: textContent }],
-      }
-    ],
-    generationConfig: {
-      maxOutputTokens: 200,  // Adjust as needed
-      temperature: 0.5,     // Adjust as needed for more or less creativity
-      stopSequences: ['\n'],  // Define stop sequences if needed
-    },
-  });
-}
-
-// Add a listener to handle the message from content script
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.textContent) {
-    callGeminiAPI(message.textContent)
-      .then(result => {
-        console.log('Summary received:', result.response.text());
-        chrome.storage.local.set({ summary: result.response.text() });
-      })
-      .catch(error => {
-        console.error('Error during API call:', error);
-      });
-  }
-});
-
