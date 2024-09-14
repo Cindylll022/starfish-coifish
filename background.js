@@ -74,7 +74,7 @@ const promptTemplate = "The following text seperated by the escape character new
 
 function callServer(textContent) {
   const finalPrompt = `${promptTemplate} ${textContent}`;  // Combine the template with text
-  fetch('http://localhost:3000/simplify', {  // Your backend server URL
+  fetch('https://starfish-coifish-h1pk1gwv0-cindys-projects-0975090c.vercel.app', {  // Your backend server URL
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
