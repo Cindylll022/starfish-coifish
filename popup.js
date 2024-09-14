@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('result').innerText = '';
   // retrieves and checks the termsDetected from local chrome storage
   chrome.storage.local.get(['termsDetected'], (result) => {
     const messageElement = document.getElementById('message');
