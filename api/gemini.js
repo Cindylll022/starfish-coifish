@@ -1,21 +1,21 @@
 const { google } = require('googleapis');
 const axios = require('axios');
-const genai = require('google-generative-ai'); // Ensure this package is installed
+const genai = require('google-generative-ai'); // check this package is installed
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const { text, client_id, client_secret, redirect_uri, code } = req.body;
 
-      // Initialize OAuth2 client
+      // oauth2 client initialization
       const oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uri);
       const { tokens } = await oauth2Client.getToken(code);
       oauth2Client.setCredentials(tokens);
 
-      // Initialize Gemini model
+      // initializing gemini api
       const model = new genai.GenerativeModel("gemini-1.5-flash");
 
-      // Define a prompt to ask Gemini to identify and summarize TOS/PP sections
+      // prompt for gemini api
       const prompt = `
         The following is text extracted from a webpage. Identify and summarize any sections related to Terms of Service, Privacy Policy, or similar legal agreements.
 
@@ -25,9 +25,9 @@ export default async function handler(req, res) {
         Summary (focusing on TOS, Privacy Policy, etc.):
       `;
 
-      // Make a request to the Gemini API
+      //gemini api request
       const response = await model.generate_content(
-        prompt, // Pass the prompt to the Gemini model
+        prompt, // passing prompt to gemini api
         {
           candidate_count: 1,
           stop_sequences: ["\n"], // End the summary generation at a new line
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         }
       );
 
-      // Send the summarized text back to the client
+      // sending it back
       res.status(200).json({ summary: response.text });
     } catch (error) {
       res.status(500).json({ error: error.message });
