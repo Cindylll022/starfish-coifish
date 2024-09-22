@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const app = express();
 const port = 3000;
 
-const apiKey = 'AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI';  // Replace with your actual API key
+const apiKey = 'AIzaSyDwBcepibESpnizbmmzxXnY_wczDcX66sI'; 
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
@@ -14,6 +14,7 @@ app.use(cors());
 app.post('/simplify', async (req, res) => {
   const textContent = req.body.text;
 
+  //we can adjust output tokens, temp, stop sequences as needed
   try {
     const result = await model.generateContent({
       contents: [
@@ -23,9 +24,9 @@ app.post('/simplify', async (req, res) => {
         }
       ],
       generationConfig: {
-        maxOutputTokens: 10000000000,  // Adjust as needed
-        temperature: 0.5,     // Adjust as needed
-        //stopSequences: ['\n'],  // Define stop sequences if needed
+        maxOutputTokens: 10000000000,  
+        temperature: 0.5,    
+        //stopSequences: ['\n'], 
       },
     });
     res.json({ summary: result.response.text() });
@@ -35,5 +36,6 @@ app.post('/simplify', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log("server running");
+  //console.log(`Server running at http://localhost:${port}`);
 });
